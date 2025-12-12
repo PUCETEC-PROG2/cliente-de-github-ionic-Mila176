@@ -1,25 +1,55 @@
-import { IonContent, IonHeader, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import './Tab1.css';
-import RepoItem from '../components/RepoItem';
+import {
+  IonContent,
+  IonHeader,
+  IonPage,
+  IonTitle,
+  IonToolbar,
+  useIonViewDidEnter,
+} from "@ionic/react";
+import { IonList } from "@ionic/react";
+import "./Tab1.css";
+import RepoItem from "../components/RepoItem";
+import React from "react";
+import { RepositoryItem } from "../interfaces/RepositoryItem";
+import { fetchRepositories } from "../services/GithubService";
 
 const Tab1: React.FC = () => {
+  const [repos, setRepos] = React.useState<RepositoryItem[]>([]);
+
+  const loadRepos = async () => {
+    const reposData = await fetchRepositories();
+    setRepos(reposData);
+  };
+
+  useIonViewDidEnter(() => {
+    console.log("******* Leyendo repositorios ... *******");
+    loadRepos();
+  });
+
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Repositorio</IonTitle>
+          <IonTitle>Repositorios</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
         <IonHeader collapse="condense">
           <IonToolbar>
-            <IonTitle size="large">Repositorio</IonTitle>
+            <IonTitle size="large">Repositorios</IonTitle>
           </IonToolbar>
         </IonHeader>
         <IonList>
-          <RepoItem name="Repositorio 1" imageUrl="https://ionicframework.com/docs/img/demos/thumbnail.svg" />
-          <RepoItem name="Repositorio 2" imageUrl="https://ionicframework.com/docs/img/demos/thumbnail.svg" />
-          <RepoItem name="Repositorio 3" imageUrl="https://ionicframework.com/docs/img/demos/thumbnail.svg" />
+          {repos.map((repo, index) => (
+            <RepoItem
+              key={index}
+              name={repo.name}
+              description={repo.description}
+              imageUrl={repo.imageUrl}
+              owner={repo.owner}
+              language={repo.language}
+            />
+          ))}
         </IonList>
       </IonContent>
     </IonPage>
